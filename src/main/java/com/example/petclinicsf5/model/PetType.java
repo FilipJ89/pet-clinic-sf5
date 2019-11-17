@@ -1,4 +1,4 @@
 package com.example.petclinicsf5.model;
 
-public class PetType {
+public class PetType extends BaseEntity{
 }
