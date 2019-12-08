@@ -1,12 +1,10 @@
 package com.example.petclinicsf5.bootstrap;
 
-import com.example.petclinicsf5.model.Owner;
-import com.example.petclinicsf5.model.Pet;
-import com.example.petclinicsf5.model.PetType;
-import com.example.petclinicsf5.model.Vet;
+import com.example.petclinicsf5.model.*;
 import com.example.petclinicsf5.services.OwnerService;
-import com.example.petclinicsf5.services.PetTypeServicw;
+import com.example.petclinicsf5.services.PetTypeService;
 import com.example.petclinicsf5.services.VetService;
+import com.example.petclinicsf5.services.VetSpecialityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -18,27 +16,50 @@ public class DataLoader implements CommandLineRunner {
 
     private final OwnerService ownerService;
     private final VetService vetService;
-    private final PetTypeServicw petTypeServicw;
+    private final PetTypeService petTypeService;
+    private final VetSpecialityService vetSpecialityService;
 
     @Autowired
-    public DataLoader(OwnerService ownerService, VetService vetService, PetTypeServicw petTypeServicw) {
+    public DataLoader(OwnerService ownerService, VetService vetService, PetTypeService petTypeService, VetSpecialityService vetSpecialityService) {
         this.ownerService = ownerService;
         this.vetService = vetService;
-        this.petTypeServicw = petTypeServicw;
+        this.petTypeService = petTypeService;
+        this.vetSpecialityService = vetSpecialityService;
     }
 
+    // run Bootstrap only if no data
     @Override
     public void run(String... args) throws Exception {
+        int count = petTypeService.findAll().size();
+        if (count == 0) {
+            loadData();
+        }
+    }
 
+    private void loadData() {
+        // -------------- Pet Types ------------- //
         PetType dog = new PetType();
         dog.setName("dog");
-        petTypeServicw.save(dog);
+        petTypeService.save(dog);
 
         PetType cat = new PetType();
         cat.setName("cat");
-        petTypeServicw.save(cat);
+        petTypeService.save(cat);
 
+        // -------- Vet Speciality Types -------- //
+        VetSpeciality radiology = new VetSpeciality();
+        radiology.setSpeciality("radiology");
+        vetSpecialityService.save(radiology);
 
+        VetSpeciality surgery = new VetSpeciality();
+        radiology.setSpeciality("surgery");
+        vetSpecialityService.save(surgery);
+
+        VetSpeciality dentistry = new VetSpeciality();
+        radiology.setSpeciality("dentistry");
+        vetSpecialityService.save(dentistry);
+
+        // --------------- Owner Data ------------ //
         Owner owner1 = new Owner();
         owner1.setFirstName("Michael");
         owner1.setLastName("Weston");
@@ -71,15 +92,20 @@ public class DataLoader implements CommandLineRunner {
 
         System.out.println("Loaded Owners....");
 
+        // --------------- Vet Data ------------ //
+
         Vet vet1 = new Vet();
         vet1.setFirstName("Sam");
         vet1.setLastName("Axe");
+        vet1.getSpecialities().add(radiology);
+        vet1.getSpecialities().add(dentistry);
 
         vetService.save(vet1);
 
         Vet vet2 = new Vet();
         vet2.setFirstName("Jessie");
         vet2.setLastName("Porter");
+        vet2.getSpecialities().add(surgery);
 
         vetService.save(vet2);
 

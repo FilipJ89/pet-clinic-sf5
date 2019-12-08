@@ -3,7 +3,7 @@ package com.example.petclinicsf5.services.map;
 import com.example.petclinicsf5.model.Owner;
 import com.example.petclinicsf5.services.OwnerService;
 import com.example.petclinicsf5.services.PetService;
-import com.example.petclinicsf5.services.PetTypeServicw;
+import com.example.petclinicsf5.services.PetTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,12 +13,12 @@ import java.util.Set;
 public class OwnerServiceMap extends AbstractMapService<Owner, Long> implements OwnerService {
 
     private final PetService petService;
-    private final PetTypeServicw petTypeServicw;
+    private final PetTypeService petTypeService;
 
     @Autowired
-    public OwnerServiceMap(PetService petService, PetTypeServicw petTypeServicw) {
+    public OwnerServiceMap(PetService petService, PetTypeService petTypeService) {
         this.petService = petService;
-        this.petTypeServicw = petTypeServicw;
+        this.petTypeService = petTypeService;
     }
 
     @Override
@@ -42,7 +42,7 @@ public class OwnerServiceMap extends AbstractMapService<Owner, Long> implements 
                 object.getPets().forEach( pet -> {
                     if (pet.getPetType() != null) {
                         if (pet.getPetType().getId() == null) {
-                            pet.setPetType(petTypeServicw.save(pet.getPetType()));
+                            pet.setPetType(petTypeService.save(pet.getPetType()));
                         }
                     } else {
                         throw new RuntimeException("Pet Type is Required");

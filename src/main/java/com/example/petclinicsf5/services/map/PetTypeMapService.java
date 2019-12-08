@@ -1,13 +1,13 @@
 package com.example.petclinicsf5.services.map;
 
 import com.example.petclinicsf5.model.PetType;
-import com.example.petclinicsf5.services.PetTypeServicw;
+import com.example.petclinicsf5.services.PetTypeService;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
 @Service
-public class PetTypeMapService extends AbstractMapService<PetType, Long> implements PetTypeServicw {
+public class PetTypeMapService extends AbstractMapService<PetType, Long> implements PetTypeService {
     @Override
     public Set<PetType> findAll() {
         return super.findAll();
