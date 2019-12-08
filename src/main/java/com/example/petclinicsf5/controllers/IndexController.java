@@ -10,4 +10,9 @@ public class IndexController {
     public String showIndex(){
         return "index";
     }
+
+    @GetMapping("/oups")
+    public String showError(){
+        return "notimplemented";
+    }
 }
