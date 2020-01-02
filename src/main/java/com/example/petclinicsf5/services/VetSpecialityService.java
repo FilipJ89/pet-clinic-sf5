@@ -1,6 +1,6 @@
 package com.example.petclinicsf5.services;
 
-import com.example.petclinicsf5.model.VetSpeciality;
+import com.example.petclinicsf5.model.Speciality;
 
-public interface VetSpecialityService extends CrudService<VetSpeciality, Long> {
+public interface VetSpecialityService extends CrudService<Speciality, Long> {
 }

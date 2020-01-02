@@ -9,7 +9,7 @@ import javax.persistence.Table;
 @Getter
 @Setter
 @Entity
-@Table(name = "types")
-public class PetType extends BaseEntity{
-    private String name;
+@Table(name = "specialities")
+public class Speciality extends BaseEntity {
+    private String speciality;
 }

@@ -1,30 +1,30 @@
 package com.example.petclinicsf5.services.map;
 
-import com.example.petclinicsf5.model.VetSpeciality;
+import com.example.petclinicsf5.model.Speciality;
 import com.example.petclinicsf5.services.VetSpecialityService;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
 @Service
-public class VetSpecialityServiceMap extends AbstractMapService<VetSpeciality, Long> implements VetSpecialityService {
+public class VetSpecialityServiceMap extends AbstractMapService<Speciality, Long> implements VetSpecialityService {
     @Override
-    public Set<VetSpeciality> findAll() {
+    public Set<Speciality> findAll() {
         return super.findAll();
     }
 
     @Override
-    public void delete(VetSpeciality object) {
+    public void delete(Speciality object) {
         super.delete(object);
     }
 
     @Override
-    public VetSpeciality save(VetSpeciality object) {
+    public Speciality save(Speciality object) {
         return super.save(object);
     }
 
     @Override
-    public VetSpeciality findById(Long id) {
+    public Speciality findById(Long id) {
         return super.findByID(id);
     }
 

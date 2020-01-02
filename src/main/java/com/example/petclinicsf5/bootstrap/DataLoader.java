@@ -47,15 +47,15 @@ public class DataLoader implements CommandLineRunner {
         petTypeService.save(cat);
 
         // -------- Vet Speciality Types -------- //
-        VetSpeciality radiology = new VetSpeciality();
+        Speciality radiology = new Speciality();
         radiology.setSpeciality("radiology");
         vetSpecialityService.save(radiology);
 
-        VetSpeciality surgery = new VetSpeciality();
+        Speciality surgery = new Speciality();
         radiology.setSpeciality("surgery");
         vetSpecialityService.save(surgery);
 
-        VetSpeciality dentistry = new VetSpeciality();
+        Speciality dentistry = new Speciality();
         radiology.setSpeciality("dentistry");
         vetSpecialityService.save(dentistry);
 
