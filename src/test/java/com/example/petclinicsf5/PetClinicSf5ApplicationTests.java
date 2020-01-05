@@ -9,5 +9,4 @@ class PetClinicSf5ApplicationTests {
     @Test
     void contextLoads() {
     }
-
 }
