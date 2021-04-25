@@ -4,6 +4,10 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
@@ -29,6 +33,9 @@ public class Pet extends BaseEntity{
         }
     }
 
+    @NotBlank
+    @Size(min = 3,max = 25)
+    @Column(name = "name")
     private String name;
 
     @ManyToOne
@@ -40,6 +47,9 @@ public class Pet extends BaseEntity{
     private Owner owner;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @PastOrPresent(message = "Birthdate cannot be in the future")
+    @NotNull(message = "Birthday field is required")
+    @Column(name = "birth_date")
     private LocalDate birthDate;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "pet")

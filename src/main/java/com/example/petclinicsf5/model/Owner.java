@@ -9,6 +9,8 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,8 +33,16 @@ public class Owner extends Person {
         }
     }
 
+    @NotBlank
+    @Size(min = 3,max = 255)
     private String address;
+
+    @NotBlank
+    @Size(min = 3,max = 25)
     private String city;
+
+    @NotBlank
+    @Size(min = 3,max = 15)
     private String telephone;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "owner")

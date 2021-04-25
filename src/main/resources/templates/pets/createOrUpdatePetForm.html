@@ -9,6 +9,11 @@
 </h2>
 <form th:object="${pet}" class="form-horizontal" method="post">
     <input type="hidden" name="id" th:value="*{id}" />
+
+    <div th:if="${#fields.hasErrors('*')}" class="alert alert-danger">
+        <p>Form was not submitted. Please correct errors below and try again</p>
+    </div>
+
     <div class="form-group has-feedback">
         <div class="form-group">
             <label class="col-sm-2 control-label">Owner</label>
