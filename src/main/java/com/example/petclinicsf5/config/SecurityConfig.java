@@ -6,17 +6,11 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
-    @Bean
-    PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
-    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -30,30 +24,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin().and().httpBasic();
     }
 
-    //todo -> More elegant than using bean with userDetails. {noop} removed as password encoding hardcoded via passwordencoder entity. Other options to be tested later
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return OwnPasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()
-                .withUser("vet").password("vet").roles("VET")
+                .withUser("vet").password("{bcrypt15}$2y$15$78JGsdBVsuFzHklE4HXDWOBWNalbWaiHUkev4OFHnG5UFeqBGDXpa").roles("VET")
                 .and()
-                .withUser("owner").password("owner").roles("OWNER");
+                .withUser("owner").password("{noop}owner").roles("OWNER");
     }
-
-    //    @Override
-//    @Bean
-//    protected UserDetailsService userDetailsService() {
-//        UserDetails vetUser = User.withDefaultPasswordEncoder()
-//                .username("vet")
-//                .password("vet")
-//                .roles("VET")
-//                .build();
-//
-//        UserDetails ownerUser = User.withDefaultPasswordEncoder()
-//                .username("owner")
-//                .password("owner")
-//                .roles("OWNER")
-//                .build();
-//
-//        return new InMemoryUserDetailsManager(vetUser, ownerUser);
-//    }
 }
