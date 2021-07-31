@@ -1,6 +1,8 @@
 package com.example.petclinicsf5.bootstrap;
 
 import com.example.petclinicsf5.model.*;
+import com.example.petclinicsf5.repositories.security.AuthorityRepository;
+import com.example.petclinicsf5.repositories.security.UserRepository;
 import com.example.petclinicsf5.services.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -18,19 +20,23 @@ public class DataLoader implements CommandLineRunner {
     private final PetTypeService petTypeService;
     private final SpecialityService specialtyService;
     private final VisitService visitService;
+    private final AuthorityRepository authorityRepository;
+    private final UserRepository userRepository;
 
     public DataLoader(OwnerService ownerService, VetService vetService, PetTypeService petTypeService,
-                      SpecialityService specialtyService, VisitService visitService) {
+                      SpecialityService specialtyService, VisitService visitService,
+                      AuthorityRepository authorityRepository, UserRepository userRepository) {
         this.ownerService = ownerService;
         this.vetService = vetService;
         this.petTypeService = petTypeService;
         this.specialtyService = specialtyService;
         this.visitService = visitService;
+        this.authorityRepository = authorityRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
     public void run(String... args) throws Exception {
-
         int count = petTypeService.findAll().size();
 
         if (count == 0 ){
@@ -116,5 +122,31 @@ public class DataLoader implements CommandLineRunner {
         vetService.save(vet2);
 
         System.out.println("Loaded Vets....");
+
+
+//        Authority owner = new Authority();
+//        owner.setRole("OWNER");
+//
+//        User user1 = new User();
+//        user1.setUsername("MichaelW89");
+//        user1.setPassword(OwnPasswordEncoderFactories.createDelegatingPasswordEncoder()
+//                .encode("{noop}owner"));
+//        user1.setEmail("michael.w@gmail.com");
+//        user1.getAuthorities().add(owner);
+//        userRepository.save(user1);
+//
+//        User user2 = new User();
+//        user2.setUsername("FioGle");
+//        user2.setPassword(OwnPasswordEncoderFactories.createDelegatingPasswordEncoder()
+//                .encode("{bcrypt15}$2y$15$D3VFie0wy4NN/k8xfgRsNuZ3Zx6ya.XQkbUcc.26UwXMd09v/ilue"));
+//        user2.setEmail("fiogle@gmail.com");
+//        user2.getAuthorities().add(owner);
+//        userRepository.save(user2);
+//
+//        owner.getUsers().add(user1);
+//        owner.getUsers().add(user2);
+//        authorityRepository.save(owner);
+//
+//        System.out.println("Loaded Users and Authorities....");
     }
 }

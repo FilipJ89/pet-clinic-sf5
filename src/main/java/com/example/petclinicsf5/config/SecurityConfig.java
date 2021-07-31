@@ -15,13 +15,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+                .csrf().disable()
                 .authorizeRequests(authorize -> {
-                    authorize.antMatchers("/", "/webjars/**", "/login", "/resources/**", "/vets**").permitAll();
+                    authorize
+                            .antMatchers("/h2-console/**").permitAll() // for H2 console free access
+                            .antMatchers("/", "/webjars/**", "/login", "/resources/**", "/vets**").permitAll();
                 })
+
                 .authorizeRequests()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin().and().httpBasic();
+
+        // H2 console frame config
+        http.headers().frameOptions().sameOrigin();
     }
 
     @Bean
@@ -31,8 +38,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()
-                .withUser("vet").password("{bcrypt15}$2y$15$78JGsdBVsuFzHklE4HXDWOBWNalbWaiHUkev4OFHnG5UFeqBGDXpa").roles("VET")
+                .withUser("MichaelW89").password("{bcrypt15}$2y$15$4AOBk5wLL1gBR4ZxpgHS1emX2vzY1TaXXgqZdiM3z8xOYfKnZ9qkK").roles("OWNER")
                 .and()
-                .withUser("owner").password("{noop}owner").roles("OWNER");
+                .withUser("FioGle").password("{noop}password").roles("OWNER")
+                .and()
+                .withUser("admin").password("{noop}admin").roles("ADMIN");
     }
 }
