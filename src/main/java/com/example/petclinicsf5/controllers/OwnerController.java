@@ -32,12 +32,13 @@ public class OwnerController {
     @RequestMapping("/find")
     public String findOwners(Model model){
         model.addAttribute("owner", Owner.builder().build());
+        model.addAttribute("owners", ownerService.findAll());
         return "owners/findOwners";
     }
 
     @GetMapping
     public String processFindForm(Owner owner, BindingResult result, Model model){
-        // allow parameterless GET request for /owners to return all records
+        // allow parameter-less GET request for /owners to return all records
         if (owner.getLastName() == null) {
             owner.setLastName(""); // empty string signifies broadest possible search
         }
@@ -55,8 +56,8 @@ public class OwnerController {
             return "redirect:/owners/" + owner.getId();
         } else {
             // multiple owners found
-            model.addAttribute("selections", results);
-            return "owners/ownerList";
+            model.addAttribute("owners", results);
+            return "owners/findOwners";
         }
     }
 

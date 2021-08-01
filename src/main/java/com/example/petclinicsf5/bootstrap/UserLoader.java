@@ -18,9 +18,30 @@ public class UserLoader implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
 
     private void loadData() {
-        Authority admin = authorityRepository.save(Authority.builder().role("ADMIN").build());
-        Authority owner = authorityRepository.save(Authority.builder().role("OWNER").build());
-        Authority vet = authorityRepository.save(Authority.builder().role("VET").build());
+        Authority admin = authorityRepository.save(Authority.builder().role("ROLE_ADMIN").build());
+        Authority owner = authorityRepository.save(Authority.builder().role("ROLE_OWNER").build());
+        Authority vet = authorityRepository.save(Authority.builder().role("ROLE_VET").build());
+
+        userRepository.save(User.builder()
+                .username("admin")
+                .password(passwordEncoder.encode("admin"))
+                .email("filip-jozwiakowski@gmail.com")
+                .authority(admin)
+                .build());
+
+        userRepository.save(User.builder()
+                .username("SamX")
+                .password(passwordEncoder.encode("password"))
+                .email("sam-axe@yahoo.com")
+                .authority(vet)
+                .build());
+
+        userRepository.save(User.builder()
+                .username("JesPort95")
+                .password(passwordEncoder.encode("password"))
+                .email("Jess95Port@gmail.com")
+                .authority(vet)
+                .build());
 
         userRepository.save(User.builder()
                 .username("MichaelW89")
@@ -36,14 +57,7 @@ public class UserLoader implements CommandLineRunner {
                 .authority(owner)
                 .build());
 
-        userRepository.save(User.builder()
-                .username("admin")
-                .password(passwordEncoder.encode("admin"))
-                .email("filip-jozwiakowski@gmail.com")
-                .authority(admin)
-                .build());
-
-        System.out.println(userRepository.count() + " users loaded...");
+        System.out.println("Loaded " + userRepository.count() + " users...");
     }
 
 
