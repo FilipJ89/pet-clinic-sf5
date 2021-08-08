@@ -9,9 +9,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
-/**
- * Created by jt on 7/25/18.
- */
 @Component
 public class DataLoader implements CommandLineRunner {
 
@@ -71,6 +68,7 @@ public class DataLoader implements CommandLineRunner {
         owner1.setAddress("123 Brickerel");
         owner1.setCity("Miami");
         owner1.setTelephone("1231231234");
+        owner1.setEmail("michael.weston@gmail.com");
 
         Pet mikesPet = new Pet();
         mikesPet.setPetType(savedDogPetType);
@@ -87,6 +85,7 @@ public class DataLoader implements CommandLineRunner {
         owner2.setAddress("12 Disney");
         owner2.setCity("Chicago");
         owner2.setTelephone("987654321");
+        owner2.setEmail("fiona.gle@gmail.com");
 
         Pet fionasCat = new Pet();
         fionasCat.setName("Just Cat");
@@ -103,6 +102,7 @@ public class DataLoader implements CommandLineRunner {
         owner3.setAddress("Nanana");
         owner3.setCity("Lala");
         owner3.setTelephone("44345343");
+        owner3.setEmail("phil.westrock@gmail.com");
 
         Pet mikepet = new Pet();
         mikepet.setName("Zorro");

@@ -19,8 +19,9 @@ public class UserLoader implements CommandLineRunner {
 
     private void loadData() {
         Authority admin = authorityRepository.save(Authority.builder().role("ROLE_ADMIN").build());
-        Authority owner = authorityRepository.save(Authority.builder().role("ROLE_OWNER").build());
         Authority vet = authorityRepository.save(Authority.builder().role("ROLE_VET").build());
+        Authority owner = authorityRepository.save(Authority.builder().role("ROLE_OWNER").build());
+
 
         userRepository.save(User.builder()
                 .username("admin")
@@ -46,14 +47,14 @@ public class UserLoader implements CommandLineRunner {
         userRepository.save(User.builder()
                 .username("MichaelW89")
                 .password(passwordEncoder.encode("password"))
-                .email("michael.w@gmail.com")
+                .email("michael.weston@gmail.com")
                 .authority(owner)
                 .build());
 
         userRepository.save(User.builder()
                 .username("FioGle")
                 .password(passwordEncoder.encode("password"))
-                .email("fiogle@gmail.com")
+                .email("fiona.gle@gmail.com")
                 .authority(owner)
                 .build());
 
