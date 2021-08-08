@@ -36,7 +36,7 @@ public class DataLoader implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         int count = petTypeService.findAll().size();
 
         if (count == 0 ){
@@ -84,9 +84,9 @@ public class DataLoader implements CommandLineRunner {
         Owner owner2 = new Owner();
         owner2.setFirstName("Fiona");
         owner2.setLastName("Glenanne");
-        owner2.setAddress("123 Brickerel");
-        owner2.setCity("Miami");
-        owner2.setTelephone("1231231234");
+        owner2.setAddress("12 Disney");
+        owner2.setCity("Chicago");
+        owner2.setTelephone("987654321");
 
         Pet fionasCat = new Pet();
         fionasCat.setName("Just Cat");
