@@ -1,5 +1,7 @@
 package com.example.petclinicsf5.controllers;
 
+import com.example.petclinicsf5.config.securityPermissions.CreatePetPermission;
+import com.example.petclinicsf5.config.securityPermissions.UpdatePetPermission;
 import com.example.petclinicsf5.model.Owner;
 import com.example.petclinicsf5.model.Pet;
 import com.example.petclinicsf5.model.PetType;
@@ -47,6 +49,7 @@ public class PetController {
         dataBinder.setDisallowedFields("id");
     }
 
+    @CreatePetPermission
     @GetMapping("/pets/new")
     public String initCreationForm(Owner owner, Model model) {
         Pet pet = Pet.builder().build();
@@ -56,6 +59,7 @@ public class PetController {
         return PETS_CREATE_UPDATE_FORM;
     }
 
+    @CreatePetPermission
     @PostMapping("/pets/new")
     public String processCreationForm(Owner owner, @Valid Pet pet, BindingResult result, Model model) {
         if (StringUtils.hasLength(pet.getName()) && pet.isNew() && owner.getPet(pet.getName(), true) != null) {
@@ -72,12 +76,14 @@ public class PetController {
         }
     }
 
+    @UpdatePetPermission
     @GetMapping("/pets/{petId}/edit")
     public String initUpdateForm(@PathVariable("petId") Long petId, Model model) {
         model.addAttribute("pet", petService.findById(petId));
         return PETS_CREATE_UPDATE_FORM;
     }
 
+    @UpdatePetPermission
     @PostMapping("/pets/{petId}/edit")
     public  String processUpdateForm(@Valid Pet pet, BindingResult result, Owner owner, Model model) {
         if (result.hasErrors()) {

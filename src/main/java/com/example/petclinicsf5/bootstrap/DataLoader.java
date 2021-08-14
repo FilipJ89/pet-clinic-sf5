@@ -139,30 +139,5 @@ public class DataLoader implements CommandLineRunner {
 
         System.out.println("Loaded " + vetService.findAll().size() + " vets...");
 
-
-//        Authority owner = new Authority();
-//        owner.setRole("OWNER");
-//
-//        User user1 = new User();
-//        user1.setUsername("MichaelW89");
-//        user1.setPassword(OwnPasswordEncoderFactories.createDelegatingPasswordEncoder()
-//                .encode("{noop}owner"));
-//        user1.setEmail("michael.w@gmail.com");
-//        user1.getAuthorities().add(owner);
-//        userRepository.save(user1);
-//
-//        User user2 = new User();
-//        user2.setUsername("FioGle");
-//        user2.setPassword(OwnPasswordEncoderFactories.createDelegatingPasswordEncoder()
-//                .encode("{bcrypt15}$2y$15$D3VFie0wy4NN/k8xfgRsNuZ3Zx6ya.XQkbUcc.26UwXMd09v/ilue"));
-//        user2.setEmail("fiogle@gmail.com");
-//        user2.getAuthorities().add(owner);
-//        userRepository.save(user2);
-//
-//        owner.getUsers().add(user1);
-//        owner.getUsers().add(user2);
-//        authorityRepository.save(owner);
-//
-//        System.out.println("Loaded Users and Authorities....");
     }
 }

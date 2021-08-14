@@ -1,5 +1,6 @@
 package com.example.petclinicsf5.controllers;
 
+import com.example.petclinicsf5.config.securityPermissions.ReadVetsPermission;
 import com.example.petclinicsf5.model.Vet;
 import com.example.petclinicsf5.services.VetService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +22,14 @@ public class VetController {
         this.vetService = vetService;
     }
 
+    @ReadVetsPermission
     @RequestMapping({"/vets", "vets/index", "vets/index.html", "vets.html"})
     public String getVetMainPage(Model model) {
         model.addAttribute("vets", vetService.findAll());
         return "vets/index";
     }
 
+    @ReadVetsPermission
     @GetMapping({"/api/vets", "/api/vets.html"})
     public @ResponseBody Set<Vet> getVetsJson() {
         return vetService.findAll();

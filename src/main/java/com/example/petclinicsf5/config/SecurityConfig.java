@@ -2,6 +2,7 @@ package com.example.petclinicsf5.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -9,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
@@ -18,9 +20,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests(authorize -> {
                     authorize
                             .antMatchers("/h2-console/**").permitAll() // for H2 console free access
-                            .antMatchers("/", "/webjars/**", "/login", "/resources/**", "/vets**").permitAll()
-                            .mvcMatchers("/owners/**").hasAnyRole("VET", "OWNER")
-                            .mvcMatchers("/**").hasRole("ADMIN");
+                            .antMatchers("/", "/webjars/**", "/login", "/resources/**", "/vets**").permitAll();
+//                            .mvcMatchers("/owners/**").hasAnyRole("VET", "OWNER")
+//                            .mvcMatchers("/**").hasRole("ADMIN");
                 })
 
                 .authorizeRequests()
@@ -36,13 +38,4 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     PasswordEncoder passwordEncoder() {
         return OwnPasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
-//    @Override
-//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-//        auth.inMemoryAuthentication()
-//                .withUser("MichaelW89").password("{bcrypt15}$2y$15$4AOBk5wLL1gBR4ZxpgHS1emX2vzY1TaXXgqZdiM3z8xOYfKnZ9qkK").roles("OWNER")
-//                .and()
-//                .withUser("FioGle").password("{noop}password").roles("OWNER")
-//                .and()
-//                .withUser("admin").password("{noop}admin").roles("ADMIN");
-//    }
 }

@@ -1,14 +1,12 @@
 package com.example.petclinicsf5.model;
 
+import com.example.petclinicsf5.model.security.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -49,6 +47,9 @@ public class Owner extends Person {
     @NotBlank
     @Email
     private String email;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    private User user;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "owner")
     private Set<Pet> pets = new HashSet<>();

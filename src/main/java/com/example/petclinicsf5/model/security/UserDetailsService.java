@@ -2,6 +2,7 @@ package com.example.petclinicsf5.model.security;
 
 import com.example.petclinicsf5.repositories.security.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,6 +15,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class UserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService {
@@ -24,23 +26,9 @@ public class UserDetailsService implements org.springframework.security.core.use
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        com.example.petclinicsf5.model.security.User user = userRepository.findByUsername(username).orElseThrow(() -> {
-            return new UsernameNotFoundException("Username: '" + username + "' not found");
-        });
+        log.debug("Getting User info via JPA");
 
-        return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),user.getPassword(),user.getEnabled(), user.getAccountNonExpired(),
-                user.getCredentialsNonExpired(),user.getAccountNonLocked(), convertToSpringAuthorities(user.getAuthorities()));
-    }
-
-    private Collection<? extends GrantedAuthority> convertToSpringAuthorities(Set<Authority> authorities) {
-        if (authorities != null && authorities.size() > 0) {
-            return authorities.stream()
-                    .map(Authority::getRole)
-                    .map(SimpleGrantedAuthority::new)
-                    .collect(Collectors.toSet());
-        } else {
-            return new HashSet<>();
-        }
+        return userRepository.findByUsername(username).orElseThrow(() ->
+                new UsernameNotFoundException("User name: " + username + " not found"));
     }
 }
