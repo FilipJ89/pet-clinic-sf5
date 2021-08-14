@@ -1,13 +1,24 @@
 package com.example.petclinicsf5.bootstrap;
 
 import com.example.petclinicsf5.model.*;
+import com.example.petclinicsf5.model.security.Authority;
+import com.example.petclinicsf5.model.security.Role;
+import com.example.petclinicsf5.model.security.User;
 import com.example.petclinicsf5.repositories.security.AuthorityRepository;
+import com.example.petclinicsf5.repositories.security.RoleRepository;
 import com.example.petclinicsf5.repositories.security.UserRepository;
 import com.example.petclinicsf5.services.*;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.NoSuchElementException;
+import java.util.function.Supplier;
 
 @Component
 public class DataLoader implements CommandLineRunner {
@@ -19,10 +30,12 @@ public class DataLoader implements CommandLineRunner {
     private final VisitService visitService;
     private final AuthorityRepository authorityRepository;
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public DataLoader(OwnerService ownerService, VetService vetService, PetTypeService petTypeService,
-                      SpecialityService specialtyService, VisitService visitService,
-                      AuthorityRepository authorityRepository, UserRepository userRepository) {
+                      SpecialityService specialtyService, VisitService visitService, AuthorityRepository authorityRepository,
+                      UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         this.ownerService = ownerService;
         this.vetService = vetService;
         this.petTypeService = petTypeService;
@@ -30,18 +43,107 @@ public class DataLoader implements CommandLineRunner {
         this.visitService = visitService;
         this.authorityRepository = authorityRepository;
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public void run(String... args) {
         int count = petTypeService.findAll().size();
-
         if (count == 0 ){
-            loadData();
+            loadSecurityData();
+            loadUserData();
+            loadWebData();
         }
     }
 
-    private void loadData() {
+    private void loadSecurityData() {
+        // Vet auths
+        Authority readVets = authorityRepository.save(Authority.builder().permission("vets.read").build());
+
+        // Visit auths
+        Authority createOrUpdateVisit = authorityRepository.save(Authority.builder().permission("visit.create/update").build());
+        Authority readVisit = authorityRepository.save(Authority.builder().permission("visit.read").build());
+
+        //Pet auths
+        Authority createPet = authorityRepository.save(Authority.builder().permission("pet.create").build());
+        Authority updatePet = authorityRepository.save(Authority.builder().permission("pet.update").build());
+
+        // Owner auths
+        Authority createOwnerAdminVet = authorityRepository.save(Authority.builder().permission("adminvet.customer.create").build());
+        Authority readOwnerAdminVet = authorityRepository.save(Authority.builder().permission("adminvet.customer.read").build());
+        Authority updateOwnerAdminVet = authorityRepository.save(Authority.builder().permission("adminvet.customer.update").build());
+        Authority deleteOwnerAdminVet = authorityRepository.save(Authority.builder().permission("adminvet.customer.delete").build());
+
+        Authority createOwnerUser = authorityRepository.save(Authority.builder().permission("user.customer.create").build());
+        Authority readOwnerUser = authorityRepository.save(Authority.builder().permission("user.customer.read").build());
+        Authority updateOwnerUser = authorityRepository.save(Authority.builder().permission("user.customer.update").build());
+        Authority deleteOwnerUser = authorityRepository.save(Authority.builder().permission("user.customer.delete").build());
+
+        Role adminRole = roleRepository.save(Role.builder().name("ADMIN").build());
+        adminRole.setAuthorities(new HashSet<>(Arrays.asList(readVets, createOrUpdateVisit, readVisit, createPet, updatePet,
+                createOwnerAdminVet, readOwnerAdminVet, updateOwnerAdminVet, deleteOwnerAdminVet)));
+
+        Role vetRole = roleRepository.save(Role.builder().name("VET").build());
+        vetRole.setAuthorities(new HashSet<>(Arrays.asList(readVets, createOrUpdateVisit, readVisit, createPet, updatePet,
+                createOwnerAdminVet, readOwnerAdminVet, updateOwnerAdminVet, deleteOwnerAdminVet)));
+
+        Role userRole = roleRepository.save(Role.builder().name("USER").build());
+        userRole.setAuthorities(new HashSet<>(Arrays.asList(readVets, createOrUpdateVisit, readVisit, createPet, updatePet,
+                createOwnerUser, readOwnerUser, updateOwnerUser, deleteOwnerUser)));
+
+        roleRepository.saveAll(Arrays.asList(adminRole, vetRole, userRole));
+    }
+
+    private void loadUserData() {
+
+        Role adminRole = roleRepository.findByName("ADMIN").orElseThrow(null);
+        Role vetRole = roleRepository.findByName("VET").orElseThrow(null);
+        Role userRole = roleRepository.findByName("USER").orElseThrow(null);
+
+        userRepository.save(User.builder()
+                .username("admin")
+                .password(passwordEncoder.encode("admin"))
+                .email("filip-jozwiakowski@gmail.com")
+                .role(adminRole)
+                .build());
+
+        userRepository.save(User.builder()
+                .username("SamX")
+                .password(passwordEncoder.encode("password"))
+                .email("sam-axe@yahoo.com")
+                .role(vetRole)
+                .build());
+
+        userRepository.save(User.builder()
+                .username("JesPort95")
+                .password(passwordEncoder.encode("password"))
+                .email("Jess95Port@gmail.com")
+                .role(vetRole)
+                .build());
+
+        userRepository.save(User.builder()
+                .username("MichaelW89")
+                .password(passwordEncoder.encode("password"))
+                .email("michael.weston@gmail.com")
+                .role(userRole)
+                .build());
+
+        userRepository.save(User.builder()
+                .username("FioGle")
+                .password(passwordEncoder.encode("password"))
+                .email("fiona.gle@gmail.com")
+                .role(userRole)
+                .build());
+
+        System.out.println("Loaded " + userRepository.count() + " users...");
+    }
+
+    private void loadWebData() {
+
+        final String FIONA_MAIL = "fiona.gle@gmail.com";
+        final String MIKE_EMAIL = "michael.weston@gmail.com";
+
         PetType dog = new PetType();
         dog.setName("Dog");
         PetType savedDogPetType = petTypeService.save(dog);
@@ -68,7 +170,8 @@ public class DataLoader implements CommandLineRunner {
         owner1.setAddress("123 Brickerel");
         owner1.setCity("Miami");
         owner1.setTelephone("1231231234");
-        owner1.setEmail("michael.weston@gmail.com");
+        owner1.setEmail(userRepository.findByEmail(MIKE_EMAIL).map(user -> user.getEmail()).orElseThrow(null));
+        owner1.setUser(userRepository.findByEmail(MIKE_EMAIL).orElseThrow(null));
 
         Pet mikesPet = new Pet();
         mikesPet.setPetType(savedDogPetType);
@@ -85,7 +188,8 @@ public class DataLoader implements CommandLineRunner {
         owner2.setAddress("12 Disney");
         owner2.setCity("Chicago");
         owner2.setTelephone("987654321");
-        owner2.setEmail("fiona.gle@gmail.com");
+        owner2.setEmail(userRepository.findByEmail(FIONA_MAIL).map(user -> user.getEmail()).orElseThrow(null));
+        owner2.setUser(userRepository.findByEmail(FIONA_MAIL).orElseThrow(null));
 
         Pet fionasCat = new Pet();
         fionasCat.setName("Just Cat");
@@ -97,12 +201,13 @@ public class DataLoader implements CommandLineRunner {
         ownerService.save(owner2);
 
         Owner owner3 = new Owner();
-        owner3.setFirstName("Philip");
+        owner3.setFirstName("Keira");
         owner3.setLastName("Westrock");
-        owner3.setAddress("Nanana");
-        owner3.setCity("Lala");
-        owner3.setTelephone("44345343");
-        owner3.setEmail("phil.westrock@gmail.com");
+        owner3.setAddress("123 Brickerel");
+        owner3.setCity("Miami");
+        owner3.setTelephone("4434534365");
+        owner3.setEmail(userRepository.findByEmail(MIKE_EMAIL).map(user -> user.getEmail()).orElseThrow(null));
+        owner3.setUser(userRepository.findByEmail(MIKE_EMAIL).orElseThrow(null));
 
         Pet mikepet = new Pet();
         mikepet.setName("Zorro");
@@ -138,6 +243,5 @@ public class DataLoader implements CommandLineRunner {
         vetService.save(vet2);
 
         System.out.println("Loaded " + vetService.findAll().size() + " vets...");
-
     }
 }
