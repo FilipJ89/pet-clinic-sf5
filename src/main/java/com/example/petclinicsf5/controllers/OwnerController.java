@@ -1,6 +1,8 @@
 package com.example.petclinicsf5.controllers;
 
+import com.example.petclinicsf5.config.securityPermissions.CreateOwnerPermission;
 import com.example.petclinicsf5.config.securityPermissions.ReadOwnersPermission;
+import com.example.petclinicsf5.config.securityPermissions.UpdateOwnerPermission;
 import com.example.petclinicsf5.model.Owner;
 import com.example.petclinicsf5.model.security.Role;
 import com.example.petclinicsf5.model.security.User;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.jws.soap.SOAPBinding;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,19 +79,26 @@ public class OwnerController {
         }
     }
 
+    @ReadOwnersPermission
     @GetMapping("/{ownerId}")
-    public ModelAndView showOwner(@PathVariable Long ownerId) {
-        ModelAndView mav = new ModelAndView("owners/ownerDetails");
-        mav.addObject(ownerService.findById(ownerId));
-        return mav;
+    public String showOwner(@PathVariable Long ownerId, Model model, @AuthenticationPrincipal User user) {
+        if (hasUserThisRole(user, "OWNER")) {
+            if (!isIdMatched(ownerId,user)) {
+                return "redirect:/owners/find";
+            }
+        }
+        model.addAttribute("owner",ownerService.findById(ownerId));
+        return "owners/ownerDetails";
     }
 
+    @CreateOwnerPermission
     @GetMapping("/new")
     public String initCreationForm(Model model) {
         model.addAttribute("owner", Owner.builder().build());
         return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
     }
 
+    @CreateOwnerPermission
     @PostMapping("/new")
     public String processCreationForm(@Valid Owner owner, BindingResult result) {
         if (result.hasErrors()) {
@@ -99,12 +109,19 @@ public class OwnerController {
         }
     }
 
+    @UpdateOwnerPermission
     @GetMapping("/{ownerId}/edit")
-    public String initUpdateOwnerForm(@PathVariable Long ownerId, Model model) {
+    public String initUpdateOwnerForm(@PathVariable Long ownerId, Model model, @AuthenticationPrincipal User user) {
+        if (hasUserThisRole(user, "OWNER")) {
+            if (!isIdMatched(ownerId,user)) {
+                return "redirect:/owners/find";
+            }
+        }
         model.addAttribute(ownerService.findById(ownerId));
         return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
     }
 
+    @UpdateOwnerPermission
     @PostMapping("/{ownerId}/edit")
     public String processUpdateOwnerForm(@Valid Owner owner, BindingResult result, @PathVariable Long ownerId) {
         if (result.hasErrors()) {
@@ -122,6 +139,10 @@ public class OwnerController {
                 .map(Role::getName)
                 .collect(Collectors.toList())
                 .contains(roleName);
+    }
+
+    private boolean isIdMatched(Long id, User user) {
+        return ownerService.findById(id).getEmail().equals(user.getEmail());
     }
 
 }
