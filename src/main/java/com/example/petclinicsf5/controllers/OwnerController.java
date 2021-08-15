@@ -1,7 +1,11 @@
 package com.example.petclinicsf5.controllers;
 
+import com.example.petclinicsf5.config.securityPermissions.ReadOwnersPermission;
 import com.example.petclinicsf5.model.Owner;
+import com.example.petclinicsf5.model.security.Role;
+import com.example.petclinicsf5.model.security.User;
 import com.example.petclinicsf5.services.OwnerService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -10,7 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequestMapping("/owners")
 @Controller
@@ -28,23 +34,32 @@ public class OwnerController {
         dataBinder.setDisallowedFields("id");
     }
 
-
+    @ReadOwnersPermission
     @RequestMapping("/find")
-    public String findOwners(Model model){
+    public String findOwners(Model model, @AuthenticationPrincipal User user){
         model.addAttribute("owner", Owner.builder().build());
-        model.addAttribute("owners", ownerService.findAll());
+        if (hasUserThisRole(user,"OWNER")) {
+            model.addAttribute("owners",ownerService.findAllByEmail(user.getEmail()));
+        } else {
+            model.addAttribute("owners",ownerService.findAll());
+        }
         return "owners/findOwners";
     }
 
+    @ReadOwnersPermission
     @GetMapping
-    public String processFindForm(Owner owner, BindingResult result, Model model){
+    public String processFindForm(Owner owner, BindingResult result, Model model, @AuthenticationPrincipal User user){
         // allow parameter-less GET request for /owners to return all records
         if (owner.getLastName() == null) {
             owner.setLastName(""); // empty string signifies broadest possible search
         }
 
-        // find owners by last name
-        List<Owner> results = ownerService.findAllByLastNameLikeIgnoreCase("%"+ owner.getLastName() + "%");
+        List<Owner> results;
+        if (hasUserThisRole(user,"OWNER")) {
+            results = ownerService.findAllByLastNameLikeIgnoreCaseAndEmail("%"+ owner.getLastName() + "%",user.getEmail());
+        } else {
+            results = ownerService.findAllByLastNameLikeIgnoreCase("%" + owner.getLastName() + "%");
+        }
 
         if (results.isEmpty()) {
             // no owners found
@@ -99,6 +114,14 @@ public class OwnerController {
             Owner savedOwner = ownerService.save(owner);
             return "redirect:/owners/" + savedOwner.getId();
         }
+    }
+
+    private boolean hasUserThisRole(User user, String roleName) {
+        return user.getRoles()
+                .stream()
+                .map(Role::getName)
+                .collect(Collectors.toList())
+                .contains(roleName);
     }
 
 }

@@ -70,27 +70,22 @@ public class DataLoader implements CommandLineRunner {
         Authority updatePet = authorityRepository.save(Authority.builder().permission("pet.update").build());
 
         // Owner auths
-        Authority createOwnerAdminVet = authorityRepository.save(Authority.builder().permission("adminvet.customer.create").build());
-        Authority readOwnerAdminVet = authorityRepository.save(Authority.builder().permission("adminvet.customer.read").build());
-        Authority updateOwnerAdminVet = authorityRepository.save(Authority.builder().permission("adminvet.customer.update").build());
-        Authority deleteOwnerAdminVet = authorityRepository.save(Authority.builder().permission("adminvet.customer.delete").build());
+        Authority createOwner = authorityRepository.save(Authority.builder().permission("owner.create").build());
+        Authority readOwner = authorityRepository.save(Authority.builder().permission("owner.read").build());
+        Authority updateOwner = authorityRepository.save(Authority.builder().permission("owner.update").build());
+        Authority deleteOwner = authorityRepository.save(Authority.builder().permission("owner.delete").build());
 
-        Authority createOwnerUser = authorityRepository.save(Authority.builder().permission("user.customer.create").build());
-        Authority readOwnerUser = authorityRepository.save(Authority.builder().permission("user.customer.read").build());
-        Authority updateOwnerUser = authorityRepository.save(Authority.builder().permission("user.customer.update").build());
-        Authority deleteOwnerUser = authorityRepository.save(Authority.builder().permission("user.customer.delete").build());
 
         Role adminRole = roleRepository.save(Role.builder().name("ADMIN").build());
         adminRole.setAuthorities(new HashSet<>(Arrays.asList(readVets, createOrUpdateVisit, readVisit, createPet, updatePet,
-                createOwnerAdminVet, readOwnerAdminVet, updateOwnerAdminVet, deleteOwnerAdminVet)));
+                createOwner, readOwner, updateOwner, deleteOwner)));
 
         Role vetRole = roleRepository.save(Role.builder().name("VET").build());
-        vetRole.setAuthorities(new HashSet<>(Arrays.asList(readVets, createOrUpdateVisit, readVisit, createPet, updatePet,
-                createOwnerAdminVet, readOwnerAdminVet, updateOwnerAdminVet, deleteOwnerAdminVet)));
+        vetRole.setAuthorities(new HashSet<>(Arrays.asList(readVets, readVisit, readOwner)));
 
-        Role userRole = roleRepository.save(Role.builder().name("USER").build());
+        Role userRole = roleRepository.save(Role.builder().name("OWNER").build());
         userRole.setAuthorities(new HashSet<>(Arrays.asList(readVets, createOrUpdateVisit, readVisit, createPet, updatePet,
-                createOwnerUser, readOwnerUser, updateOwnerUser, deleteOwnerUser)));
+                createOwner, readOwner, updateOwner, deleteOwner)));
 
         roleRepository.saveAll(Arrays.asList(adminRole, vetRole, userRole));
     }
@@ -99,7 +94,7 @@ public class DataLoader implements CommandLineRunner {
 
         Role adminRole = roleRepository.findByName("ADMIN").orElseThrow(null);
         Role vetRole = roleRepository.findByName("VET").orElseThrow(null);
-        Role userRole = roleRepository.findByName("USER").orElseThrow(null);
+        Role userRole = roleRepository.findByName("OWNER").orElseThrow(null);
 
         userRepository.save(User.builder()
                 .username("admin")
@@ -170,7 +165,7 @@ public class DataLoader implements CommandLineRunner {
         owner1.setAddress("123 Brickerel");
         owner1.setCity("Miami");
         owner1.setTelephone("1231231234");
-        owner1.setEmail(userRepository.findByEmail(MIKE_EMAIL).map(user -> user.getEmail()).orElseThrow(null));
+        owner1.setEmail(userRepository.findByEmail(MIKE_EMAIL).map(User::getEmail).orElseThrow(null));
         owner1.setUser(userRepository.findByEmail(MIKE_EMAIL).orElseThrow(null));
 
         Pet mikesPet = new Pet();
@@ -188,7 +183,7 @@ public class DataLoader implements CommandLineRunner {
         owner2.setAddress("12 Disney");
         owner2.setCity("Chicago");
         owner2.setTelephone("987654321");
-        owner2.setEmail(userRepository.findByEmail(FIONA_MAIL).map(user -> user.getEmail()).orElseThrow(null));
+        owner2.setEmail(userRepository.findByEmail(FIONA_MAIL).map(User::getEmail).orElseThrow(null));
         owner2.setUser(userRepository.findByEmail(FIONA_MAIL).orElseThrow(null));
 
         Pet fionasCat = new Pet();
@@ -206,7 +201,7 @@ public class DataLoader implements CommandLineRunner {
         owner3.setAddress("123 Brickerel");
         owner3.setCity("Miami");
         owner3.setTelephone("4434534365");
-        owner3.setEmail(userRepository.findByEmail(MIKE_EMAIL).map(user -> user.getEmail()).orElseThrow(null));
+        owner3.setEmail(userRepository.findByEmail(MIKE_EMAIL).map(User::getEmail).orElseThrow(null));
         owner3.setUser(userRepository.findByEmail(MIKE_EMAIL).orElseThrow(null));
 
         Pet mikepet = new Pet();
