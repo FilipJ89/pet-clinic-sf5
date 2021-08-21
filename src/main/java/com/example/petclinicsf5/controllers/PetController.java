@@ -99,8 +99,9 @@ public class PetController {
                                  @AuthenticationPrincipal User user, final RedirectAttributes redirectAttributes) {
 
         if (validationFunctions.hasUserThisRole(user, "OWNER")) {
+            Owner petOwner = petService.findById(petId).getOwner();
             if (!validationFunctions.isUserOwnerIdMatched(ownerId,user) ||
-                    !validationFunctions.isUserOwnerIdMatched(validationFunctions.getOwnerByPetId(petId).getId(),user)){
+                    !validationFunctions.isUserOwnerIdMatched(petOwner.getId(),user)){
                 redirectAttributes.addFlashAttribute("redirectionError", "You do not have permission to edit pet for this user");
                 return "redirect:/owners/find";
             }
@@ -124,4 +125,7 @@ public class PetController {
         }
     }
 
+    public Owner getOwnerByPetId(Long petId) {
+        return petService.findById(petId).getOwner();
+    }
 }
