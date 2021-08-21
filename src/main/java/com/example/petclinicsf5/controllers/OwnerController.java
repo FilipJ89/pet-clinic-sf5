@@ -13,11 +13,9 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.jws.soap.SOAPBinding;
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,8 +37,9 @@ public class OwnerController {
 
     @ReadOwnersPermission
     @RequestMapping("/find")
-    public String findOwners(Model model, @AuthenticationPrincipal User user){
+    public String findOwners(Model model, @AuthenticationPrincipal User user, @ModelAttribute("redirectionError") String error){
         model.addAttribute("owner", Owner.builder().build());
+        model.addAttribute("errorMessage",error);
         if (hasUserThisRole(user,"OWNER")) {
             model.addAttribute("owners",ownerService.findAllByEmail(user.getEmail()));
         } else {
@@ -81,9 +80,11 @@ public class OwnerController {
 
     @ReadOwnersPermission
     @GetMapping("/{ownerId}")
-    public String showOwner(@PathVariable Long ownerId, Model model, @AuthenticationPrincipal User user) {
+    public String showOwner(@PathVariable Long ownerId, Model model, @AuthenticationPrincipal User user,
+                            final RedirectAttributes redirectAttributes) {
         if (hasUserThisRole(user, "OWNER")) {
-            if (!isIdMatched(ownerId,user)) {
+            if (!isUserIdMatched(ownerId,user)) {
+                redirectAttributes.addFlashAttribute("redirectionError", "You do not have permission to read this user details");
                 return "redirect:/owners/find";
             }
         }
@@ -111,9 +112,11 @@ public class OwnerController {
 
     @UpdateOwnerPermission
     @GetMapping("/{ownerId}/edit")
-    public String initUpdateOwnerForm(@PathVariable Long ownerId, Model model, @AuthenticationPrincipal User user) {
+    public String initUpdateOwnerForm(@PathVariable Long ownerId, Model model, @AuthenticationPrincipal User user,
+                                      final RedirectAttributes redirectAttributes) {
         if (hasUserThisRole(user, "OWNER")) {
-            if (!isIdMatched(ownerId,user)) {
+            if (!isUserIdMatched(ownerId,user)) {
+                redirectAttributes.addFlashAttribute("redirectionError", "You do not have permission to edit this user details");
                 return "redirect:/owners/find";
             }
         }
@@ -141,7 +144,7 @@ public class OwnerController {
                 .contains(roleName);
     }
 
-    private boolean isIdMatched(Long id, User user) {
+    private boolean isUserIdMatched(Long id, User user) {
         return ownerService.findById(id).getEmail().equals(user.getEmail());
     }
 
