@@ -5,15 +5,19 @@ import com.example.petclinicsf5.config.securityPermissions.UpdatePetPermission;
 import com.example.petclinicsf5.model.Owner;
 import com.example.petclinicsf5.model.Pet;
 import com.example.petclinicsf5.model.PetType;
+import com.example.petclinicsf5.model.security.User;
 import com.example.petclinicsf5.services.OwnerService;
 import com.example.petclinicsf5.services.PetService;
 import com.example.petclinicsf5.services.PetTypeService;
+import com.example.petclinicsf5.services.ValidationFunctions;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -27,11 +31,14 @@ public class PetController {
     private final PetService petService;
     private final OwnerService ownerService;
     private final PetTypeService petTypeService;
+    private final ValidationFunctions validationFunctions;
 
-    public PetController(PetService petService, OwnerService ownerService, PetTypeService petTypeService) {
+    public PetController(PetService petService, OwnerService ownerService,
+                         PetTypeService petTypeService, ValidationFunctions validationFunctions) {
         this.petService = petService;
         this.ownerService = ownerService;
         this.petTypeService = petTypeService;
+        this.validationFunctions = validationFunctions;
     }
 
     @ModelAttribute("types")
@@ -51,7 +58,17 @@ public class PetController {
 
     @CreatePetPermission
     @GetMapping("/pets/new")
-    public String initCreationForm(Owner owner, Model model) {
+    public String initCreationForm(Owner owner, Model model,@AuthenticationPrincipal User user,
+                                   final RedirectAttributes redirectAttributes,
+                                   @PathVariable("ownerId") Long ownerId) {
+
+        if (validationFunctions.hasUserThisRole(user, "OWNER")) {
+            if (!validationFunctions.isUserOwnerIdMatched(ownerId,user)) {
+                redirectAttributes.addFlashAttribute("redirectionError", "You do not have permission to add new pet to this user");
+                return "redirect:/owners/find";
+            }
+        }
+
         Pet pet = Pet.builder().build();
         owner.getPets().add(pet);
         pet.setOwner(owner);
@@ -78,7 +95,17 @@ public class PetController {
 
     @UpdatePetPermission
     @GetMapping("/pets/{petId}/edit")
-    public String initUpdateForm(@PathVariable("petId") Long petId, Model model) {
+    public String initUpdateForm(@PathVariable("petId") Long petId, @PathVariable("ownerId") Long ownerId, Model model,
+                                 @AuthenticationPrincipal User user, final RedirectAttributes redirectAttributes) {
+
+        if (validationFunctions.hasUserThisRole(user, "OWNER")) {
+            if (!validationFunctions.isUserOwnerIdMatched(ownerId,user) ||
+                    !validationFunctions.isUserOwnerIdMatched(validationFunctions.getOwnerByPetId(petId).getId(),user)){
+                redirectAttributes.addFlashAttribute("redirectionError", "You do not have permission to edit pet for this user");
+                return "redirect:/owners/find";
+            }
+        }
+
         model.addAttribute("pet", petService.findById(petId));
         return PETS_CREATE_UPDATE_FORM;
     }

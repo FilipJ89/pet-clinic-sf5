@@ -4,9 +4,9 @@ import com.example.petclinicsf5.config.securityPermissions.CreateOwnerPermission
 import com.example.petclinicsf5.config.securityPermissions.ReadOwnersPermission;
 import com.example.petclinicsf5.config.securityPermissions.UpdateOwnerPermission;
 import com.example.petclinicsf5.model.Owner;
-import com.example.petclinicsf5.model.security.Role;
 import com.example.petclinicsf5.model.security.User;
 import com.example.petclinicsf5.services.OwnerService;
+import com.example.petclinicsf5.services.ValidationFunctions;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,7 +17,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RequestMapping("/owners")
 @Controller
@@ -25,9 +24,11 @@ public class OwnerController {
     private static final String VIEWS_OWNER_CREATE_OR_UPDATE_FORM = "owners/createOrUpdateOwnerForm";
 
     private final OwnerService ownerService;
+    private final ValidationFunctions validationFunctions;
 
-    public OwnerController(OwnerService ownerService) {
+    public OwnerController(OwnerService ownerService, ValidationFunctions validationFunctions) {
         this.ownerService = ownerService;
+        this.validationFunctions = validationFunctions;
     }
 
     @InitBinder
@@ -40,7 +41,7 @@ public class OwnerController {
     public String findOwners(Model model, @AuthenticationPrincipal User user, @ModelAttribute("redirectionError") String error){
         model.addAttribute("owner", Owner.builder().build());
         model.addAttribute("errorMessage",error);
-        if (hasUserThisRole(user,"OWNER")) {
+        if (validationFunctions.hasUserThisRole(user,"OWNER")) {
             model.addAttribute("owners",ownerService.findAllByEmail(user.getEmail()));
         } else {
             model.addAttribute("owners",ownerService.findAll());
@@ -57,7 +58,7 @@ public class OwnerController {
         }
 
         List<Owner> results;
-        if (hasUserThisRole(user,"OWNER")) {
+        if (validationFunctions.hasUserThisRole(user,"OWNER")) {
             results = ownerService.findAllByLastNameLikeIgnoreCaseAndEmail("%"+ owner.getLastName() + "%",user.getEmail());
         } else {
             results = ownerService.findAllByLastNameLikeIgnoreCase("%" + owner.getLastName() + "%");
@@ -82,8 +83,8 @@ public class OwnerController {
     @GetMapping("/{ownerId}")
     public String showOwner(@PathVariable Long ownerId, Model model, @AuthenticationPrincipal User user,
                             final RedirectAttributes redirectAttributes) {
-        if (hasUserThisRole(user, "OWNER")) {
-            if (!isUserIdMatched(ownerId,user)) {
+        if (validationFunctions.hasUserThisRole(user, "OWNER")) {
+            if (!validationFunctions.isUserOwnerIdMatched(ownerId,user)) {
                 redirectAttributes.addFlashAttribute("redirectionError", "You do not have permission to read this user details");
                 return "redirect:/owners/find";
             }
@@ -114,8 +115,8 @@ public class OwnerController {
     @GetMapping("/{ownerId}/edit")
     public String initUpdateOwnerForm(@PathVariable Long ownerId, Model model, @AuthenticationPrincipal User user,
                                       final RedirectAttributes redirectAttributes) {
-        if (hasUserThisRole(user, "OWNER")) {
-            if (!isUserIdMatched(ownerId,user)) {
+        if (validationFunctions.hasUserThisRole(user, "OWNER")) {
+            if (!validationFunctions.isUserOwnerIdMatched(ownerId,user)) {
                 redirectAttributes.addFlashAttribute("redirectionError", "You do not have permission to edit this user details");
                 return "redirect:/owners/find";
             }
@@ -135,17 +136,4 @@ public class OwnerController {
             return "redirect:/owners/" + savedOwner.getId();
         }
     }
-
-    private boolean hasUserThisRole(User user, String roleName) {
-        return user.getRoles()
-                .stream()
-                .map(Role::getName)
-                .collect(Collectors.toList())
-                .contains(roleName);
-    }
-
-    private boolean isUserIdMatched(Long id, User user) {
-        return ownerService.findById(id).getEmail().equals(user.getEmail());
-    }
-
 }
