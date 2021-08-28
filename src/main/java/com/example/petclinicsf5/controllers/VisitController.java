@@ -50,11 +50,13 @@ public class VisitController {
     @GetMapping("/visits/new")
     public String initNewVisitForm(@PathVariable("petId") Long petId, @PathVariable("ownerId") Long ownerId,
                                    @AuthenticationPrincipal User user, final RedirectAttributes redirectAttributes) {
-        Owner petOwner = petService.findById(petId).getOwner();
-        if (!validationFunctions.isUserOwnerIdMatched(ownerId,user) ||
-                !validationFunctions.isUserOwnerIdMatched(petOwner.getId(),user)){
-            redirectAttributes.addFlashAttribute("redirectionError", "You do not have permission to edit visits for this user");
-            return "redirect:/owners/find";
+        if (validationFunctions.hasUserThisRole(user, "OWNER")) {
+            Owner petOwner = petService.findById(petId).getOwner();
+            if (!validationFunctions.isUserOwnerIdMatched(ownerId,user) ||
+                    !validationFunctions.isUserOwnerIdMatched(petOwner.getId(),user)){
+                redirectAttributes.addFlashAttribute("redirectionError", "You do not have permission to edit visits for this user");
+                return "redirect:/owners/find";
+            }
         }
         return VISIT_CREATE_OR_UPDATE_FORM;
     }

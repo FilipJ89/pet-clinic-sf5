@@ -52,7 +52,7 @@
 </table>
 
 <br />
-<a class="btn btn-default" th:href="@{/owners/new}">Add Owner</a>
+<a sec:authorize="hasAuthority('owner.create')" class="btn btn-default" th:href="@{/owners/new}">Add Owner</a>
 
 </body>
 </html>
