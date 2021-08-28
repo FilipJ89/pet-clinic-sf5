@@ -58,12 +58,17 @@
                       <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
                       <span>Veterinarians</span>
                   </li>
-  
-                  <li th:replace="::menuItem ('/login','login','login','log-in','Login')">
+
+                  <li sec:authorize="!isAuthenticated()" th:replace="::menuItem ('/login','login','login','log-in','Login')">
                       <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>
                       <span>Login</span>
                   </li>
-  
+
+                  <li sec:authorize="isAuthenticated()" th:replace="::menuItem ('/logout','logout','logout','log-out','Logout')">
+                      <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
+                      <span>Login</span>
+                  </li>
+
               </ul>
           </div>
       </div>
