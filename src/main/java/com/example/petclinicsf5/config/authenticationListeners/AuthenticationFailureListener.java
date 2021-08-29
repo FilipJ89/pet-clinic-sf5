@@ -1,6 +1,7 @@
 package com.example.petclinicsf5.config.authenticationListeners;
 
 import com.example.petclinicsf5.model.security.LoginFailure;
+import com.example.petclinicsf5.model.security.User;
 import com.example.petclinicsf5.repositories.security.LoginFailureRepository;
 import com.example.petclinicsf5.repositories.security.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
+
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Slf4j
@@ -44,6 +49,20 @@ public class AuthenticationFailureListener {
             LoginFailure failure = loginFailureRepository.save(builder.build());
             log.debug("Login failure saved. ID: " + failure.getId());
 
+            if (failure.getUser() != null) {
+                lockUserAccount(failure.getUser());
+            }
+        }
+    }
+
+    private void lockUserAccount(User user) {
+        Timestamp checkPeriod = Timestamp.valueOf(LocalDateTime.now().minusHours(1));
+        List<LoginFailure> failures = loginFailureRepository.findAllByUserAndAndCreatedDateAfter(user, checkPeriod);
+
+        if (failures.size() > 2) {
+            log.debug("Locking account for user '" + user.getUsername() + "'");
+            user.setAccountNonLocked(false);
+            userRepository.save(user);
         }
     }
 }
