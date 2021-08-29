@@ -24,9 +24,8 @@ public class AuthenticationSuccessListener {
         log.debug("User login success");
 
         if (event.getSource() instanceof UsernamePasswordAuthenticationToken) {
-            LoginSuccess.LoginSuccessBuilder builder = LoginSuccess.builder();
-
             UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) event.getSource();
+            LoginSuccess.LoginSuccessBuilder builder = LoginSuccess.builder();
 
             if(token.getPrincipal() instanceof User){
                 User user = (User) token.getPrincipal();
@@ -43,7 +42,7 @@ public class AuthenticationSuccessListener {
             }
 
             LoginSuccess loginSuccess = loginSuccessRepository.save(builder.build());
-            log.debug("Login Success saved. Id: " + loginSuccess.getId());
+            log.debug("Login Success saved. ID: " + loginSuccess.getId());
         }
     }
 }
