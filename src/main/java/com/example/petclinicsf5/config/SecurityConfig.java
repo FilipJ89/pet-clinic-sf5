@@ -1,5 +1,6 @@
 package com.example.petclinicsf5.config;
 
+import com.example.petclinicsf5.config.google2fa.Google2faFilter;
 import com.example.petclinicsf5.model.security.UserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -10,6 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @RequiredArgsConstructor
@@ -20,17 +22,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserDetailsService userDetailsService;
     private final PersistentTokenRepository persistentTokenRepository;
+    private final Google2faFilter google2faFilter;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()
                 .authorizeRequests(authorize -> {
                     authorize
                             .antMatchers("/h2-console/**").permitAll() // for H2 console free access
                             .antMatchers("/", "/webjars/**", "/login", "/resources/**", "/vets**").permitAll();
-//                            .mvcMatchers("/owners/**").hasAnyRole("VET", "OWNER")
-//                            .mvcMatchers("/**").hasRole("ADMIN");
                 })
 
                 .authorizeRequests()
@@ -47,6 +47,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         .logoutSuccessUrl("/?success")
                         .permitAll())
                 .httpBasic()
+                .and().csrf().ignoringAntMatchers("/h2-console/**")
                 .and().rememberMe()
                         .tokenRepository(persistentTokenRepository)
                         .userDetailsService(userDetailsService);
@@ -58,6 +59,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         // H2 console frame config
         http.headers().frameOptions().sameOrigin();
+
+        // 2FA filter
+        http.addFilterBefore(google2faFilter, SessionManagementFilter.class);
     }
 
     @Bean

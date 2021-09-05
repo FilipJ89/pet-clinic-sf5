@@ -18,7 +18,7 @@ public class UserUnlockService {
 
     private final UserRepository userRepository;
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 600000)
     public void unlockUsers() {
         log.debug("Checking if any accounts to unlock...");
         Timestamp lockDate = Timestamp.valueOf(LocalDateTime.now().minusMinutes(30));

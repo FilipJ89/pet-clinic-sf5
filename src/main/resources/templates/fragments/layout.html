@@ -66,7 +66,11 @@
 
                   <li sec:authorize="isAuthenticated()" th:replace="::menuItem ('/logout','logout','logout','log-out','Logout')">
                       <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
-                      <span>Login</span>
+                      <span>Logout</span>
+                  </li>
+                  <li sec:authorize="isAuthenticated()" th:replace="::menuItem ('/user/register2fa','users','register/cancel 2FA','arrow-down','2FA')">
+                      <span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
+                      <span>2FA</span>
                   </li>
 
               </ul>

@@ -68,6 +68,14 @@ public class User implements UserDetails, CredentialsContainer {
     @UpdateTimestamp
     private Timestamp lastModifiedDate;
 
+    @Builder.Default
+    private Boolean isUser2fa = false;
+
+    private String user2faSecret;
+
+    @Transient
+    private Boolean isUser2faRequired = true;
+
     @Override
     public boolean isAccountNonExpired() {
         return this.accountNonExpired;
