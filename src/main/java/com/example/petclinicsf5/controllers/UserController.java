@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Slf4j
 @RequestMapping("/user")
@@ -24,19 +25,22 @@ public class UserController {
     private final GoogleAuthenticator googleAuthenticator;
 
     @GetMapping("/register2fa")
-    public String register2fa(Model model) {
-        User user = getAuthenticatedUser();
+    public String register2fa(Model model, final RedirectAttributes redirectAttributes) {
+        User authenticatedUser = getAuthenticatedUser();
+        //Since context does not reload, get user data from database to check below condition
+        User user = userRepository.findById(authenticatedUser.getId()).orElseThrow(null);
 
-        // todo If user is already registered for 2FA redirect to index page. Does no work currently as changes to user are not catched
         if (user.getIsUser2fa()) {
             log.debug("User '" + user.getUsername() + "' opting out of 2FA...");
 
             user.setIsUser2fa(false);
             user.setIsUser2faRequired(true);
+            user.setUser2faSecret(null);
             userRepository.save(user);
 
             log.debug("2FA for user '" + user.getUsername() + "' has been DEACTIVATED");
-            return "index";
+            redirectAttributes.addFlashAttribute("message2fa", "You have deactivated 2FA authentication");
+            return "redirect:/";
         } else {
             log.debug("User '" + user.getUsername() + "' opting in for 2FA...");
 
@@ -48,7 +52,7 @@ public class UserController {
     }
 
     @PostMapping("/register2fa")
-    public String register2fa(@RequestParam(name = "verifyCode") Integer code) {
+    public String register2fa(@RequestParam(name = "verifyCode") Integer code, final RedirectAttributes redirectAttributes) {
 
         User user = getAuthenticatedUser();
         log.debug("2FA code entered is: " + code);
@@ -59,7 +63,8 @@ public class UserController {
             userRepository.save(userFromDatabase);
             log.debug("2FA for user '" + user.getUsername() + "' has been ACTIVATED");
 
-            return "index";
+            redirectAttributes.addFlashAttribute("message2fa", "You have activated 2FA authentication");
+            return "redirect:/";
         } else {
             log.debug("2FA registration validation unsuccessful... returning to 2FA");
             return "users/register2fa";

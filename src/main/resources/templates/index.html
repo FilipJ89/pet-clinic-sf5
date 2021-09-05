@@ -8,8 +8,9 @@
     <title>Pet Clinic Index</title>
 </head>
 <body>
+
 <h2 sec:authorize="isAuthenticated()" th:text="#{welcome1} + ' ' + ${#authentication?.principal?.username} + '. ' + #{welcome2}">Welcome</h2>
-<!--<h2 sec:authorize="isAuthenticated()" th:text="${#authentication?.principal?.isUser2fa} ? 'You are using 2FA authentication' : 'You are not using 2FA authentication'">2FA auth</h2>-->
+<h2 style="color:darkgreen" th:text="${message2fa}"></h2>
 <h2 th:if="${param.success}" class="alert alert-success">You have been logged out</h2>
 <div class="row">
     <div class="col-md-12">
