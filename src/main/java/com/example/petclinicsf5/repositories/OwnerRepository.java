@@ -14,4 +14,5 @@ public interface OwnerRepository extends CrudRepository<Owner, Long> {
     List<Owner> findAllByLastNameLikeIgnoreCase(String lastName);
 
     List<Owner> findAllByLastNameLikeIgnoreCaseAndEmail(String lastName, String email);
+
 }
