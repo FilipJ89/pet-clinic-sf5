@@ -58,6 +58,10 @@ public class DataLoader implements CommandLineRunner {
     }
 
     private void loadSecurityData() {
+
+        // Admin privilages
+        Authority admin = authorityRepository.save(Authority.builder().permission("admin").build());
+
         // Vet auths
         Authority readVets = authorityRepository.save(Authority.builder().permission("vets.read").build());
 
@@ -77,7 +81,7 @@ public class DataLoader implements CommandLineRunner {
 
 
         Role adminRole = roleRepository.save(Role.builder().name("ADMIN").build());
-        adminRole.setAuthorities(new HashSet<>(Arrays.asList(readVets, createOrUpdateVisit, readVisit, createPet, updatePet,
+        adminRole.setAuthorities(new HashSet<>(Arrays.asList(admin, readVets, createOrUpdateVisit, readVisit, createPet, updatePet,
                 createOwner, readOwner, updateOwner, deleteOwner)));
 
         Role vetRole = roleRepository.save(Role.builder().name("VET").build());

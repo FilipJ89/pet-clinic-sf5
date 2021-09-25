@@ -7,7 +7,6 @@ import com.example.petclinicsf5.model.Owner;
 import com.example.petclinicsf5.model.security.User;
 import com.example.petclinicsf5.services.OwnerService;
 import com.example.petclinicsf5.services.ValidationFunctions;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -102,10 +101,13 @@ public class OwnerController {
 
     @CreateOwnerPermission
     @PostMapping("/new")
-    public String processCreationForm(@Valid Owner owner, BindingResult result) {
+    public String processCreationForm(@Valid Owner owner, BindingResult result, @AuthenticationPrincipal User user) {
         if (result.hasErrors()) {
             return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
         } else {
+            if (!validationFunctions.hasUserThisRole(user,"ADMIN")) {
+                owner.setEmail(user.getEmail());
+            }
             Owner savedOwner =  ownerService.save(owner);
             return "redirect:/owners/" + savedOwner.getId();
         }
@@ -127,11 +129,15 @@ public class OwnerController {
 
     @UpdateOwnerPermission
     @PostMapping("/{ownerId}/edit")
-    public String processUpdateOwnerForm(@Valid Owner owner, BindingResult result, @PathVariable Long ownerId) {
+    public String processUpdateOwnerForm(@Valid Owner owner, BindingResult result,
+                                         @PathVariable Long ownerId, @AuthenticationPrincipal User user) {
         if (result.hasErrors()) {
             return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
         } else {
             owner.setId(ownerId);
+            if (!validationFunctions.hasUserThisRole(user,"ADMIN")) {
+                owner.setEmail(user.getEmail());
+            }
             Owner savedOwner = ownerService.save(owner);
             return "redirect:/owners/" + savedOwner.getId();
         }

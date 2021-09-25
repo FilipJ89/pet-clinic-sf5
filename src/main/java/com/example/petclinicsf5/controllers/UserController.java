@@ -39,7 +39,7 @@ public class UserController {
             userRepository.save(user);
 
             log.debug("2FA for user '" + user.getUsername() + "' has been DEACTIVATED");
-            redirectAttributes.addFlashAttribute("message2fa", "You have deactivated 2FA authentication");
+            redirectAttributes.addFlashAttribute("indexMessage", "You have deactivated 2FA authentication");
             return "redirect:/";
         } else {
             log.debug("User '" + user.getUsername() + "' opting in for 2FA...");
@@ -63,7 +63,7 @@ public class UserController {
             userRepository.save(userFromDatabase);
             log.debug("2FA for user '" + user.getUsername() + "' has been ACTIVATED");
 
-            redirectAttributes.addFlashAttribute("message2fa", "You have activated 2FA authentication");
+            redirectAttributes.addFlashAttribute("indexMessage", "You have activated 2FA authentication");
             return "redirect:/";
         } else {
             log.debug("2FA registration validation unsuccessful... returning to 2FA");
