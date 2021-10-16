@@ -3,6 +3,12 @@
 
 <body>
 
+<div th:if="${errorMessage != ''}" class="alert">
+    <span class="alert alert-danger" th:if="${errorMessage == 'errorOwner'}" th:text="#{accessRejected.owner}"></span>
+    <span class="alert alert-danger" th:if="${errorMessage == 'errorPet'}" th:text="#{accessRejected.pet}"></span>
+    <span class="alert alert-danger" th:if="${errorMessage == 'errorVisit'}" th:text="#{accessRejected.visit}"></span>
+</div>
+
 <h2>Owner List</h2>
 
 <form th:object="${owner}" th:action="@{/owners}" method="get"
@@ -25,7 +31,7 @@
         </div>
     </div>
 </form>
-<span style="color:red" th:text="${errorMessage}"></span>
+
 <table id="vets" class="table table-striped">
     <thead>
     <tr>

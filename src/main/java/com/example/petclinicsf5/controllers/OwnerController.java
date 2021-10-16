@@ -84,7 +84,7 @@ public class OwnerController {
                             final RedirectAttributes redirectAttributes) {
         if (validationFunctions.hasUserThisRole(user, "OWNER")) {
             if (!validationFunctions.isUserOwnerIdMatched(ownerId,user)) {
-                redirectAttributes.addFlashAttribute("redirectionError", "You do not have permission to read this user details");
+                redirectAttributes.addFlashAttribute("redirectionError", "errorOwner");
                 return "redirect:/owners/find";
             }
         }
@@ -119,7 +119,7 @@ public class OwnerController {
                                       final RedirectAttributes redirectAttributes) {
         if (validationFunctions.hasUserThisRole(user, "OWNER")) {
             if (!validationFunctions.isUserOwnerIdMatched(ownerId,user)) {
-                redirectAttributes.addFlashAttribute("redirectionError", "You do not have permission to edit this user details");
+                redirectAttributes.addFlashAttribute("redirectionError", "errorOwner");
                 return "redirect:/owners/find";
             }
         }

@@ -54,7 +54,7 @@ public class VisitController {
             Owner petOwner = petService.findById(petId).getOwner();
             if (!validationFunctions.isUserOwnerIdMatched(ownerId,user) ||
                     !validationFunctions.isUserOwnerIdMatched(petOwner.getId(),user)){
-                redirectAttributes.addFlashAttribute("redirectionError", "You do not have permission to edit visits for this user");
+                redirectAttributes.addFlashAttribute("redirectionError", "errorVisit");
                 return "redirect:/owners/find";
             }
         }

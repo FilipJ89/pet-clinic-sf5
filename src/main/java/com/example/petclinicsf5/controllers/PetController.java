@@ -64,7 +64,7 @@ public class PetController {
 
         if (validationFunctions.hasUserThisRole(user, "OWNER")) {
             if (!validationFunctions.isUserOwnerIdMatched(ownerId,user)) {
-                redirectAttributes.addFlashAttribute("redirectionError", "You do not have permission to add new pet to this user");
+                redirectAttributes.addFlashAttribute("redirectionError", "errorPet");
                 return "redirect:/owners/find";
             }
         }
@@ -102,7 +102,7 @@ public class PetController {
             Owner petOwner = petService.findById(petId).getOwner();
             if (!validationFunctions.isUserOwnerIdMatched(ownerId,user) ||
                     !validationFunctions.isUserOwnerIdMatched(petOwner.getId(),user)){
-                redirectAttributes.addFlashAttribute("redirectionError", "You do not have permission to edit pet for this user");
+                redirectAttributes.addFlashAttribute("redirectionError", "errorPet");
                 return "redirect:/owners/find";
             }
         }
